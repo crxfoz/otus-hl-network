@@ -1,0 +1,43 @@
+---
+version: '3.4'
+
+x-logging: &logging
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "256m"
+
+services:
+  db:
+    container_name: db
+    image: mysql:8.0.26
+    <<: *logging
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+#    volumes:
+#      - ./scheme.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./data/db:/var/lib/mysql
+
+  backend:
+    build:
+      context: .
+      dockerfile: cmd/backend/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      WAIT_HOSTS: db:3306
+
+#  metrics:
+#    container_name: metrics
+#    image: warmans/prometheus-aggregate-exporter:v2.1.1
+#    <<: *logging
+#    ports:
+#      - "8181:8080"
+#    environment:
+#      TARGETS: http://backend:2112/metrics
