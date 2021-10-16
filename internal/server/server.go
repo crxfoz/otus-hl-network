@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 
-	"otus-hl-network/internal/auth"
 	"otus-hl-network/internal/user/delivery"
 
 	"github.com/labstack/echo"
@@ -15,12 +14,12 @@ type Server struct {
 	authMiddleware *AuthMiddleware
 }
 
-func New(jwtManager *auth.JWTManager, user *delivery.UserHander) *Server {
+func New(authManager AuthManager, user *delivery.UserHander) *Server {
 	e := echo.New()
 	e.HideBanner = true
 
 	return &Server{
-		authMiddleware: &AuthMiddleware{jwtManager: jwtManager},
+		authMiddleware: &AuthMiddleware{authManager: authManager},
 		user:           user,
 		e:              e,
 	}

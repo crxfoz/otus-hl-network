@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
-	"otus-hl-network/internal/auth"
+	"otus-hl-network/internal/domain"
 	"otus-hl-network/internal/server"
 	userdl "otus-hl-network/internal/user/delivery"
 	userrepo "otus-hl-network/internal/user/repository"
@@ -15,6 +14,24 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
+
+type NilAuthManager struct{}
+
+func (n NilAuthManager) Generate(user domain.User) (domain.UserContext, error) {
+	return domain.UserContext{
+		ID:       1,
+		Username: "foo@gmail.com",
+		Token:    "",
+	}, nil
+}
+
+func (n NilAuthManager) Verify(accessToken string) (domain.UserContext, error) {
+	return domain.UserContext{
+		ID:       1,
+		Username: "foo@gmail.com",
+		Token:    "",
+	}, nil
+}
 
 func main() {
 
@@ -29,14 +46,14 @@ func main() {
 		return
 	}
 
-	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
+	// jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
 
 	// user initialization
 	userRepo := userrepo.NewUserRepo(sqlConn)
 	userUA := userua.NewUsecase(userRepo)
 	userDelievery := userdl.New(userUA)
 
-	srv := server.New(jwtManager,
+	srv := server.New(&NilAuthManager{},
 		userDelievery,
 	)
 

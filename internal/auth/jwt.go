@@ -49,7 +49,7 @@ func (manager *JWTManager) Generate(user domain.User) (domain.UserContext, error
 	}, nil
 }
 
-func (manager *JWTManager) Verify(accessToken string) (*UserClaims, error) {
+func (manager *JWTManager) Verify(accessToken string) (domain.UserContext, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
 		&UserClaims{},
@@ -64,13 +64,17 @@ func (manager *JWTManager) Verify(accessToken string) (*UserClaims, error) {
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("invalid token: %w", err)
+		return domain.UserContext{}, fmt.Errorf("invalid token: %w", err)
 	}
 
 	claims, ok := token.Claims.(*UserClaims)
 	if !ok {
-		return nil, fmt.Errorf("invalid token claims")
+		return domain.UserContext{}, fmt.Errorf("invalid token claims")
 	}
 
-	return claims, nil
+	return domain.UserContext{
+		ID:       claims.UserID,
+		Username: claims.Username,
+		Token:    accessToken,
+	}, nil
 }
