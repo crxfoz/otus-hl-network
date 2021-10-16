@@ -22,7 +22,7 @@ type UserInfo struct {
 type UpdateUserInfo struct {
 	FirstName string
 	LastName  string
-	Age       int
+	Age       int64
 	City      string
 	Interests string
 	Gender    string

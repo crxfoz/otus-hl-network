@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	authdl "otus-hl-network/internal/auth/delivery"
 	"otus-hl-network/internal/domain"
 	"otus-hl-network/internal/server"
 	userdl "otus-hl-network/internal/user/delivery"
@@ -34,7 +35,6 @@ func (n NilAuthManager) Verify(accessToken string) (domain.UserContext, error) {
 }
 
 func main() {
-
 	sqlConn, err := sqlx.Connect("mysql",
 		fmt.Sprintf("%s:%s@(%s:3306)/%s",
 			os.Getenv("DB_USERNAME"),
@@ -47,14 +47,19 @@ func main() {
 	}
 
 	// jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
+	jwtManager := &NilAuthManager{}
 
 	// user initialization
 	userRepo := userrepo.NewUserRepo(sqlConn)
 	userUA := userua.NewUsecase(userRepo)
 	userDelievery := userdl.New(userUA)
 
-	srv := server.New(&NilAuthManager{},
+	// auth initialization
+	authDelivery := authdl.New(jwtManager, userUA)
+
+	srv := server.New(jwtManager,
 		userDelievery,
+		authDelivery,
 	)
 
 	if err := srv.Run(8080); err != nil {

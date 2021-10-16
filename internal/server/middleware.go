@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"otus-hl-network/internal/auth"
 	"otus-hl-network/internal/domain"
 
 	"github.com/sirupsen/logrus"
@@ -13,13 +14,8 @@ import (
 
 type UserDataNext func(echo.Context, domain.UserContext) error
 
-type AuthManager interface {
-	Generate(user domain.User) (domain.UserContext, error)
-	Verify(accessToken string) (domain.UserContext, error)
-}
-
 type AuthMiddleware struct {
-	authManager AuthManager
+	authManager auth.AuthManager
 }
 
 func (a *AuthMiddleware) Do(next UserDataNext) echo.HandlerFunc {

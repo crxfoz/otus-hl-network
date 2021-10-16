@@ -3,24 +3,28 @@ package server
 import (
 	"fmt"
 
-	"otus-hl-network/internal/user/delivery"
+	"otus-hl-network/internal/auth"
+	authdl "otus-hl-network/internal/auth/delivery"
+	userdl "otus-hl-network/internal/user/delivery"
 
 	"github.com/labstack/echo"
 )
 
 type Server struct {
-	user           *delivery.UserHander
+	user           *userdl.UserHander
+	auth           *authdl.AuthHandler
 	e              *echo.Echo
 	authMiddleware *AuthMiddleware
 }
 
-func New(authManager AuthManager, user *delivery.UserHander) *Server {
+func New(authManager auth.AuthManager, user *userdl.UserHander, auth *authdl.AuthHandler) *Server {
 	e := echo.New()
 	e.HideBanner = true
 
 	return &Server{
 		authMiddleware: &AuthMiddleware{authManager: authManager},
 		user:           user,
+		auth:           auth,
 		e:              e,
 	}
 }
@@ -29,22 +33,16 @@ func (s *Server) Run(port int) error {
 
 	apiGroup := s.e.Group("/api/v1")
 
-	// s.e.GET("/auth", s.user.Login)
-	// s.e.POST("/auth", s.user.Authorize)
-	//
-	// s.e.GET("/register", s.user.Authorize)
-
 	// API endpoints
-	// apiGroup.POST("/register", nil)
-	//
-	// apiGroup.GET("/profile/{id}", nil)
-	// apiGroup.GET("/profile", nil)
-
+	apiGroup.POST("/auth", s.auth.Authorize)
+	apiGroup.POST("/register", s.user.Register)
+	apiGroup.GET("/profile/{id}", s.authMiddleware.Do(s.user.Profile))
+	apiGroup.GET("/profile", s.authMiddleware.Do(s.user.Profile))
+	apiGroup.POST("/profile", s.authMiddleware.Do(s.user.Profile))
 	apiGroup.GET("/users", s.authMiddleware.Do(s.user.Users))
-
-	// apiGroup.GET("/friends", nil)
-	// apiGroup.POST("/friends", nil)
-	// apiGroup.DELETE("/friends", nil)
+	apiGroup.GET("/friends", s.authMiddleware.Do(s.user.Friends))
+	apiGroup.POST("/friends/{id}", s.authMiddleware.Do(s.user.AddFriend))
+	apiGroup.DELETE("/friends/{id}", s.authMiddleware.Do(s.user.DeleteFriend))
 
 	// render endpoints
 	// s.e.GET("/auth", nil)

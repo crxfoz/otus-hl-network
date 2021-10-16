@@ -18,7 +18,11 @@ type User struct {
 }
 
 type UserInfo struct {
-	UserID    int64    `json:"user_id"`
+	UserID int64 `json:"user_id"`
+	UserData
+}
+
+type UserData struct {
 	FirstName string   `json:"first_name"`
 	LastName  string   `json:"last_name"`
 	Age       int64    `json:"age"`
@@ -34,9 +38,9 @@ type Friends struct {
 }
 
 type UserContext struct {
-	ID       int64
-	Username string
-	Token    string
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
 }
 
 type UserRepo interface {
@@ -47,8 +51,16 @@ type UserRepo interface {
 	AddUserWithInfo(username string, password string, info repository.UpdateUserInfo) error
 	UpdateUserInfo(id int64, info repository.UpdateUserInfo) error
 	AddFriends(id int64, friendIDs ...int64) error
+	DeleteFriends(id int64, friendIDs ...int64) error
 }
 
 type UserUsecase interface {
 	UserListExcept(id ...int64) ([]UserInfo, error)
+	FindFriends(id int64) ([]UserInfo, error)
+	AddFriend(userID int64, friendID int64) error
+	DeleteFriend(userID int64, friendID int64) error
+	FindUserInfo(id int64) (UserInfo, error)
+	FindAccount(username string) (User, error)
+	AddUserWithInfo(username string, password string, info UserData) error
+	UpdateUserInfo(id int64, info UserData) error
 }

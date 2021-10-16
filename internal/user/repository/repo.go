@@ -123,3 +123,15 @@ func (r *UserRepo) AddFriends(id int64, friendIDs ...int64) error {
 
 	return nil
 }
+func (r *UserRepo) DeleteFriends(id int64, friendIDs ...int64) error {
+	// TODO: use transaction here
+
+	for _, friendID := range friendIDs {
+		_, err := r.conn.Exec("DELETE FROM friends WHERE user_id=? AND friend_id=?", id, friendID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
