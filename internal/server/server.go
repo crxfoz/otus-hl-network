@@ -44,9 +44,13 @@ func (s *Server) Run(port int) error {
 	apiGroup.POST("/friends/:id", s.authMiddleware.Do(s.user.AddFriend))
 	apiGroup.DELETE("/friends/:id", s.authMiddleware.Do(s.user.DeleteFriend))
 
-	s.e.Static("/assets", "/frontend/assets")
-	s.e.File("/", "/frontend/index.html")
-	s.e.File("/favicon.ico", "/frontend/favicon.ico")
+	// s.e.Static("/assets", "/frontend/assets")
+	// s.e.File("/", "/frontend/index.html")
+	// s.e.File("/favicon.ico", "/frontend/favicon.ico")
+
+	s.e.Static("/assets", "../../frontend/dist/assets")
+	s.e.File("/", "../../frontend/dist/index.html")
+	s.e.File("/favicon.ico", "../../frontend/dist/favicon.ico")
 
 	// render endpoints
 	// s.e.GET("/auth", nil)
