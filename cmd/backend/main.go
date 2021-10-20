@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
+	"otus-hl-network/internal/auth"
 	authdl "otus-hl-network/internal/auth/delivery"
 	"otus-hl-network/internal/domain"
 	"otus-hl-network/internal/server"
@@ -46,8 +48,8 @@ func main() {
 		return
 	}
 
-	// jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
-	jwtManager := &NilAuthManager{}
+	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
+	// jwtManager := &NilAuthManager{}
 
 	// user initialization
 	userRepo := userrepo.NewUserRepo(sqlConn)

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type UserRepo struct {
@@ -64,20 +65,26 @@ func (r *UserRepo) FindFriends(id int64) ([]UserInfo, error) {
 }
 
 func (r *UserRepo) AddUserWithInfo(username string, password string, info UpdateUserInfo) error {
-	// TODO: use transaction here
-
-	_, err := r.conn.Exec("INSERT INTO users (username, password) VALUES (?, ?)", username, password)
+	tx, err := r.conn.Beginx()
 	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO users (username, password) VALUES (?, ?)", username, password)
+	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	var newID int64
 
-	if err := r.conn.Get(&newID, "SELECT LAST_INSERT_ID()"); err != nil {
+	if err := tx.Get(&newID, "SELECT LAST_INSERT_ID()"); err != nil {
+		logrus.Info("last intesrt id: ", newID)
+		tx.Rollback()
 		return err
 	}
 
-	_, err = r.conn.Exec("INSERT INTO user_info (user_id, first_name, last_name, age, interests, city, gender) VALUES (?, ?, ?, ?, ?, ?, ?)",
+	_, err = tx.Exec("INSERT INTO user_info (user_id, first_name, last_name, age, interests, city, gender) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		newID,
 		info.FirstName,
 		info.LastName,
@@ -87,10 +94,11 @@ func (r *UserRepo) AddUserWithInfo(username string, password string, info Update
 		info.Gender,
 	)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	return nil
+	return tx.Commit()
 }
 
 func (r *UserRepo) UpdateUserInfo(id int64, info UpdateUserInfo) error {

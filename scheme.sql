@@ -25,14 +25,10 @@ CREATE TABLE `friends`
     `user_id`   bigint unsigned NOT NULL,
     `friend_id` bigint unsigned NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `id` (`id`),
-    KEY `user_id` (`user_id`),
-    KEY `friend_id` (`friend_id`),
-    CONSTRAINT `friends_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    CONSTRAINT `friends_ibfk_2` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`)
+    UNIQUE KEY `id` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
+  COLLATE = utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `user_info`;
 CREATE TABLE `user_info`
@@ -44,13 +40,12 @@ CREATE TABLE `user_info`
     `age`        int          DEFAULT NULL,
     `interests`  text,
     `city`       varchar(255) DEFAULT NULL,
+    `gender` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `id` (`id`),
-    UNIQUE KEY `user_id` (`user_id`) USING BTREE,
-    CONSTRAINT `user_info_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    UNIQUE KEY `id` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
+  COLLATE = utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`
@@ -62,7 +57,7 @@ CREATE TABLE `users`
     UNIQUE KEY `id` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
+  COLLATE = utf8mb4_unicode_ci;
 
 
 

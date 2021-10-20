@@ -16,9 +16,9 @@ services:
       - .env
     ports:
       - "3306:3306"
-#    volumes:
-#      - ./scheme.sql:/docker-entrypoint-initdb.d/init.sql
-#      - ./data/db:/var/lib/mysql
+    volumes:
+      - ./scheme.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/db:/var/lib/mysql
 
   backend:
     build:
@@ -28,6 +28,8 @@ services:
       - .env
     ports:
       - "8080:8080"
+    volumes:
+      - "./frontend/dist:/frontend"
     depends_on:
       - db
     environment:
