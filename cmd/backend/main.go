@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"otus-hl-network/internal/auth"
@@ -48,6 +49,14 @@ func main() {
 		return
 	}
 
+	var backendPort int
+	portStr := os.Getenv("BACKEND_PORT")
+	if x, err := strconv.Atoi(portStr); err == nil {
+		backendPort = x
+	} else {
+		backendPort = 8080
+	}
+
 	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
 	// jwtManager := &NilAuthManager{}
 
@@ -64,7 +73,7 @@ func main() {
 		authDelivery,
 	)
 
-	if err := srv.Run(8080); err != nil {
+	if err := srv.Run(backendPort); err != nil {
 		logrus.WithError(err).Fatal("web-server stopped with error")
 	}
 }
