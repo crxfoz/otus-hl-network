@@ -48,9 +48,9 @@ func (s *Server) Run(port int) error {
 	// s.e.File("/", "/frontend/index.html")
 	// s.e.File("/favicon.ico", "/frontend/favicon.ico")
 
-	s.e.Static("/assets", "../../frontend/dist/assets")
-	s.e.File("/", "../../frontend/dist/index.html")
-	s.e.File("/favicon.ico", "../../frontend/dist/favicon.ico")
+	s.e.Static("/assets", "/app/frontend/dist/assets")
+	s.e.File("/", "/app/frontend/dist/index.html")
+	s.e.File("/favicon.ico", "/app/frontend/dist/favicon.ico")
 
 	// render endpoints
 	// s.e.GET("/auth", nil)
