@@ -50,7 +50,7 @@ func main() {
 	}
 
 	var backendPort int
-	portStr := os.Getenv("BACKEND_PORT")
+	portStr := os.Getenv("PORT")
 	if x, err := strconv.Atoi(portStr); err == nil {
 		backendPort = x
 	} else {
