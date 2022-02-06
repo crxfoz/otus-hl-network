@@ -17,6 +17,17 @@
 /*!40101 SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES = @@SQL_NOTES, SQL_NOTES = 0 */;
 
+DROP TABLE IF EXISTS `example`;
+CREATE TABLE `example`
+(
+    `id`   int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) DEFAULT NULL,
+    `age`  int(11)      DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
 
 DROP TABLE IF EXISTS `friends`;
 CREATE TABLE `friends`
@@ -40,7 +51,7 @@ CREATE TABLE `user_info`
     `age`        int          DEFAULT NULL,
     `interests`  text,
     `city`       varchar(255) DEFAULT NULL,
-    `gender` varchar(255) DEFAULT NULL,
+    `gender`     varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `id` (`id`)
 ) ENGINE = InnoDB

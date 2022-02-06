@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
-	"otus-hl-network/internal/auth"
 	authdl "otus-hl-network/internal/auth/delivery"
 	"otus-hl-network/internal/domain"
 	"otus-hl-network/internal/server"
@@ -39,10 +37,11 @@ func (n NilAuthManager) Verify(accessToken string) (domain.UserContext, error) {
 
 func main() {
 	sqlConn, err := sqlx.Connect("mysql",
-		fmt.Sprintf("%s:%s@(%s:3306)/%s",
+		fmt.Sprintf("%s:%s@(%s:%s)/%s",
 			os.Getenv("DB_USERNAME"),
 			os.Getenv("DB_PASSWORD"),
 			os.Getenv("DB_HOSTNAME"),
+			os.Getenv("DB_PORT"),
 			os.Getenv("DB_DATABASE")))
 	if err != nil {
 		logrus.WithError(err).Error("could not connect to DB")
@@ -57,8 +56,8 @@ func main() {
 		backendPort = 8080
 	}
 
-	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
-	// jwtManager := &NilAuthManager{}
+	// jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
+	jwtManager := &NilAuthManager{}
 
 	// user initialization
 	userRepo := userrepo.NewUserRepo(sqlConn)
