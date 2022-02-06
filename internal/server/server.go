@@ -43,14 +43,15 @@ func (s *Server) Run(port int) error {
 	apiGroup.GET("/friends", s.authMiddleware.Do(s.user.Friends))
 	apiGroup.POST("/friends/:id", s.authMiddleware.Do(s.user.AddFriend))
 	apiGroup.DELETE("/friends/:id", s.authMiddleware.Do(s.user.DeleteFriend))
+	apiGroup.GET("/search", s.authMiddleware.Do(s.user.Search))
 
-	// s.e.Static("/assets", "/frontend/assets")
-	// s.e.File("/", "/frontend/index.html")
-	// s.e.File("/favicon.ico", "/frontend/favicon.ico")
+	s.e.Static("/assets", "/frontend/assets")
+	s.e.File("/", "/frontend/index.html")
+	s.e.File("/favicon.ico", "/frontend/favicon.ico")
 
-	s.e.Static("/assets", "/app/frontend/dist/assets")
-	s.e.File("/", "/app/frontend/dist/index.html")
-	s.e.File("/favicon.ico", "/app/frontend/dist/favicon.ico")
+	// s.e.Static("/assets", "/app/frontend/dist/assets")
+	// s.e.File("/", "/app/frontend/dist/index.html")
+	// s.e.File("/favicon.ico", "/app/frontend/dist/favicon.ico")
 
 	// render endpoints
 	// s.e.GET("/auth", nil)

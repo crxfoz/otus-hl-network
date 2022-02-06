@@ -52,6 +52,7 @@ type UserRepo interface {
 	UpdateUserInfo(id int64, info repository.UpdateUserInfo) error
 	AddFriends(id int64, friendIDs ...int64) error
 	DeleteFriends(id int64, friendIDs ...int64) error
+	Search(firstName string, lastName string) ([]repository.UserInfo, error)
 }
 
 type UserUsecase interface {
@@ -63,4 +64,5 @@ type UserUsecase interface {
 	FindAccount(username string) (User, error)
 	AddUserWithInfo(username string, password string, info UserData) error
 	UpdateUserInfo(id int64, info UserData) error
+	Search(firstName string, lastName string) ([]UserInfo, error)
 }

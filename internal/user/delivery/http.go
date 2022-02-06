@@ -119,3 +119,16 @@ func (h *UserHander) DeleteFriend(c echo.Context, userContext domain.UserContext
 
 	return c.JSON(http.StatusOK, domain.HTTPok{Status: "ok"})
 }
+
+func (h *UserHander) Search(c echo.Context, userContext domain.UserContext) error {
+	firstName := c.QueryParam("fname")
+	lastName := c.QueryParam("lname")
+
+	users, err := h.repo.Search(firstName, lastName)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, domain.HTTPError{Error: "users with given params aren't found"})
+
+	}
+
+	return c.JSON(http.StatusOK, users)
+}

@@ -1,12 +1,27 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
 
 type UserRepo struct {
 	conn *sqlx.DB
+}
+
+func (r *UserRepo) Search(firstName string, lastName string) ([]UserInfo, error) {
+	var accounts []UserInfo
+
+	if err := r.conn.Select(&accounts, "SELECT * FROM user_info WHERE first_name LIKE ? AND last_name LIKE ? ORDER BY id",
+		fmt.Sprintf("%s%%", firstName),
+		fmt.Sprintf("%s%%", lastName),
+	); err != nil {
+		return []UserInfo{}, err
+	}
+
+	return accounts, nil
 }
 
 func NewUserRepo(conn *sqlx.DB) *UserRepo {

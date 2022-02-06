@@ -13,6 +13,20 @@ type Usecase struct {
 	repo domain.UserRepo
 }
 
+func (u *Usecase) Search(firstName string, lastName string) ([]domain.UserInfo, error) {
+	users, err := u.repo.Search(firstName, lastName)
+	if err != nil {
+		return nil, fmt.Errorf("repository error: %v", err)
+	}
+
+	dusers := make([]domain.UserInfo, 0, len(users))
+	for _, item := range users {
+		dusers = append(dusers, DTOUserInfo(item))
+	}
+
+	return dusers, nil
+}
+
 func NewUsecase(repo domain.UserRepo) *Usecase {
 	return &Usecase{repo: repo}
 }
