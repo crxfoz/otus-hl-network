@@ -2,6 +2,62 @@
 version: '3.4'
 
 services:
+  mongo-shard1:
+    build:
+      context: cfg/mongod
+    container_name: mongo_shard1
+    volumes:
+      - ./cfg/mongod/mongod.conf:/etc/mongod.conf
+    environment:
+      - REPSET_NAME=shard1
+    command: mongod -f /etc/mongod.conf --shardsvr --replSet shard1
+
+  mongo-shard2:
+    build:
+      context: cfg/mongod
+    container_name: mongo_shard2
+    volumes:
+      - ./cfg/mongod/mongod.conf:/etc/mongod.conf
+    environment:
+      - REPSET_NAME=shard2
+    command: mongod -f /etc/mongod.conf --shardsvr --replSet shard2
+
+  mongo-shard3:
+    build:
+      context: cfg/mongod
+    container_name: mongo_shard3
+    volumes:
+      - ./cfg/mongod/mongod.conf:/etc/mongod.conf
+    environment:
+      - REPSET_NAME=shard3
+    command: mongod -f /etc/mongod.conf --shardsvr --replSet shard3
+
+  mongo-configdb:
+    build:
+      context: cfg/mongod
+    container_name: mongo-configdb
+    volumes:
+      - ./cfg/mongod/mongod.conf:/etc/mongod.conf
+    environment:
+      - REPSET_NAME=configdb
+    command: mongod -f /etc/mongod.conf --configsvr --replSet configdb
+
+  mongo-router:
+    build:
+      context: cfg/mongos
+    container_name: mongo-router
+    command: mongos --port 27017 --bind_ip 0.0.0.0 --configdb "configdb/mongo-configdb:27017"
+    depends_on:
+      - mongo-shard1
+      - mongo-shard2
+      - mongo-shard3
+      - mongo-configdb
+    env_file:
+      - .env
+    environment:
+      - SHARD_LIST=shard1/mongo-shard1:27017;shard2/mongo-shard2:27017;shard3/mongo-shard3:27017
+    ports:
+      - "27017:27017"
 
   db-master:
     container_name: db-master
@@ -66,8 +122,9 @@ services:
     depends_on:
       - db-master
       - proxysql
+      - mongo-router
     environment:
-      WAIT_HOSTS: db-master:3306
+      WAIT_HOSTS: db-master:3306,mongo-router:27017
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -100,6 +157,16 @@ services:
       - 3000:3000
     depends_on:
       - prometheus
+#
+#  mongo:
+#    image: mongo:latest
+#    container_name: mongo
+#    volumes:
+#      - ./data/mongo:/data/db
+#    env_file:
+#      - .env
+#    ports:
+#      - 27017:27017
 
 #  metrics:
 #    container_name: metrics

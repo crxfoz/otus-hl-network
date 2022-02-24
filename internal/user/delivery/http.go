@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"otus-hl-network/internal/domain"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
 
 	"github.com/labstack/echo"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"otus-hl-network/internal/domain"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
 
 	"github.com/dgrijalva/jwt-go"
 )

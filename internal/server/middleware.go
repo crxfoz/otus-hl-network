@@ -4,12 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"otus-hl-network/internal/auth"
-	"otus-hl-network/internal/domain"
-
-	"github.com/sirupsen/logrus"
-
+	"github.com/crxfoz/otus-hl-network/internal/auth"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 )
 
 type UserDataNext func(echo.Context, domain.UserContext) error

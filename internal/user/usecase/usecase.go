@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"otus-hl-network/internal/auth"
-	"otus-hl-network/internal/domain"
-	"otus-hl-network/internal/user/repository"
+	"github.com/crxfoz/otus-hl-network/internal/auth"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
+	"github.com/crxfoz/otus-hl-network/internal/user/repository"
 )
 
 type Usecase struct {

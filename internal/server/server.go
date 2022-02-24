@@ -3,9 +3,10 @@ package server
 import (
 	"fmt"
 
-	"otus-hl-network/internal/auth"
-	authdl "otus-hl-network/internal/auth/delivery"
-	userdl "otus-hl-network/internal/user/delivery"
+	"github.com/crxfoz/otus-hl-network/internal/auth"
+	authdl "github.com/crxfoz/otus-hl-network/internal/auth/delivery"
+	chatdl "github.com/crxfoz/otus-hl-network/internal/chat/delivery"
+	userdl "github.com/crxfoz/otus-hl-network/internal/user/delivery"
 
 	"github.com/labstack/echo"
 )
@@ -13,11 +14,12 @@ import (
 type Server struct {
 	user           *userdl.UserHander
 	auth           *authdl.AuthHandler
+	chat           *chatdl.ChatHandler
 	e              *echo.Echo
 	authMiddleware *AuthMiddleware
 }
 
-func New(authManager auth.AuthManager, user *userdl.UserHander, auth *authdl.AuthHandler) *Server {
+func New(authManager auth.AuthManager, user *userdl.UserHander, auth *authdl.AuthHandler, chat *chatdl.ChatHandler) *Server {
 	e := echo.New()
 	e.HideBanner = true
 
@@ -25,6 +27,7 @@ func New(authManager auth.AuthManager, user *userdl.UserHander, auth *authdl.Aut
 		authMiddleware: &AuthMiddleware{authManager: authManager},
 		user:           user,
 		auth:           auth,
+		chat:           chat,
 		e:              e,
 	}
 }
@@ -44,6 +47,9 @@ func (s *Server) Run(port int) error {
 	apiGroup.POST("/friends/:id", s.authMiddleware.Do(s.user.AddFriend))
 	apiGroup.DELETE("/friends/:id", s.authMiddleware.Do(s.user.DeleteFriend))
 	apiGroup.GET("/search", s.authMiddleware.Do(s.user.Search))
+
+	apiGroup.GET("/chat/:id", s.authMiddleware.Do(s.chat.ConnectChat))
+	apiGroup.POST("/chat", s.authMiddleware.Do(s.chat.CreateChat))
 
 	s.e.Static("/assets", "/frontend/assets")
 	s.e.File("/", "/frontend/index.html")

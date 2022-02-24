@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"otus-hl-network/internal/user/repository"
+	"github.com/crxfoz/otus-hl-network/internal/user/repository"
 )
 
 type Gender string

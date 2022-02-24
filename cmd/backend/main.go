@@ -1,20 +1,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
-	authdl "otus-hl-network/internal/auth/delivery"
-	"otus-hl-network/internal/domain"
-	"otus-hl-network/internal/server"
-	userdl "otus-hl-network/internal/user/delivery"
-	userrepo "otus-hl-network/internal/user/repository"
-	userua "otus-hl-network/internal/user/usecase"
+	"github.com/crxfoz/otus-hl-network/internal/auth"
+	authdl "github.com/crxfoz/otus-hl-network/internal/auth/delivery"
+	chatdl "github.com/crxfoz/otus-hl-network/internal/chat/delivery"
+	chatrepo "github.com/crxfoz/otus-hl-network/internal/chat/repository"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
+	"github.com/crxfoz/otus-hl-network/internal/server"
+	userdl "github.com/crxfoz/otus-hl-network/internal/user/delivery"
+	userrepo "github.com/crxfoz/otus-hl-network/internal/user/repository"
+	userua "github.com/crxfoz/otus-hl-network/internal/user/usecase"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type NilAuthManager struct{}
@@ -56,8 +63,34 @@ func main() {
 		backendPort = 8080
 	}
 
-	// jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
-	jwtManager := &NilAuthManager{}
+	mongoConn, err := mongo.NewClient(options.Client().ApplyURI(
+		fmt.Sprintf("mongodb://%s:%s/",
+			os.Getenv("MONGO_HOST"),
+			os.Getenv("MONGO_PORT"),
+		),
+	))
+	if err != nil {
+		logrus.WithError(err).Error("could not create mongo")
+		return
+	}
+
+	if err := mongoConn.Connect(context.Background()); err != nil {
+		logrus.WithError(err).Error("could not connect to mongo")
+		return
+	}
+
+	mDB := mongoConn.Database("chat")
+
+	var jwtManager auth.AuthManager
+
+	if os.Getenv("DEBUG") == "1" {
+		// use it for testing
+		// it disables auth and it may cause some problems with testing cuz it says that user is auth'ed as user with id=1
+		jwtManager = &NilAuthManager{}
+	} else {
+		// use it for _prod_
+		jwtManager = auth.NewJWTManager(os.Getenv("JWT_SECRET_KEY"), time.Hour*24)
+	}
 
 	// user initialization
 	userRepo := userrepo.NewUserRepo(sqlConn)
@@ -67,9 +100,14 @@ func main() {
 	// auth initialization
 	authDelivery := authdl.New(jwtManager, userUA)
 
+	// chat initialization
+	chatRepo := chatrepo.NewMongo(context.Background(), mDB, time.Second*5)
+	chatDelievery := chatdl.NewChatHandler(chatRepo)
+
 	srv := server.New(jwtManager,
 		userDelievery,
 		authDelivery,
+		chatDelievery,
 	)
 
 	if err := srv.Run(backendPort); err != nil {

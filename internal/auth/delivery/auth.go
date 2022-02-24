@@ -3,8 +3,8 @@ package delivery
 import (
 	"net/http"
 
-	"otus-hl-network/internal/auth"
-	"otus-hl-network/internal/domain"
+	"github.com/crxfoz/otus-hl-network/internal/auth"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
 
 	"github.com/labstack/echo"
 	"golang.org/x/crypto/bcrypt"

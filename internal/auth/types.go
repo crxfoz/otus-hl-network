@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"otus-hl-network/internal/domain"
+	"github.com/crxfoz/otus-hl-network/internal/domain"
 
 	"golang.org/x/crypto/bcrypt"
 )
